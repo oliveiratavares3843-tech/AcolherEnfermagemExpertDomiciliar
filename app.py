@@ -2,71 +2,97 @@ import streamlit as st
 import pandas as pd
 import sqlite3
 from datetime import datetime
+from fpdf import FPDF
 
-# Configuração da página
-st.set_page_config(page_title="Home Care 2026", layout="wide")
+# --- CONFIGURAÇÃO E LOGIN ---
+st.set_page_config(page_title="Home Care Pro 2026", layout="wide")
 
-# Função para conectar ao banco de dados (SQLite)
-def conectar_bd():
-    conn = sqlite3.connect('atendimentos_v2026.db')
-    return conn
+def check_password():
+    if "auth" not in st.session_state:
+        st.session_state.auth = False
+    if not st.session_state.auth:
+        with st.form("Login"):
+            st.subheader("🔒 Acesso Restrito")
+            user = st.text_input("Usuário")
+            password = st.text_input("Senha", type="password")
+            if st.form_submit_button("Entrar"):
+                if user == "enfermagem" and password == "2026": # Mude sua senha aqui!
+                    st.session_state.auth = True
+                    st.rerun()
+                else:
+                    st.error("Usuário ou senha incorretos")
+        return False
+    return True
 
-# Criar a tabela se não existir
-conn = conectar_bd()
-conn.execute('''CREATE TABLE IF NOT EXISTS prontuario 
-             (id INTEGER PRIMARY KEY AUTOINCREMENT, 
-              data TEXT, paciente TEXT, enfermeira TEXT, 
-              pa TEXT, sat INTEGER, temp TEXT, evolucao TEXT)''')
-conn.close()
-
-st.title("🩺 Sistema de Gestão - Enfermagem Especializada")
-st.sidebar.header("Menu de Navegação")
-aba = st.sidebar.radio("Ir para:", ["Registrar Visita", "Histórico de Pacientes"])
-
-if aba == "Registrar Visita":
-    st.subheader("📝 Novo Registro de Evolução Clínica")
-    
-    with st.form("form_visita", clear_on_submit=True):
-        col1, col2 = st.columns(2)
-        with col1:
-            paciente = st.text_input("Nome do Paciente")
-            enfermeira = st.text_input("Enfermeira Responsável")
-        with col2:
-            data_visita = st.date_input("Data da Visita", datetime.now())
-            pa = st.text_input("Pressão Arterial (ex: 120/80)")
-
-        col3, col4 = st.columns(2)
-        with col3:
-            sat = st.number_input("Saturação O2 (%)", min_value=0, max_value=100, value=95)
-        with col4:
-            temp = st.text_input("Temperatura (ex: 36.5°C)")
-            
-        evolucao = st.text_area("Evolução de Enfermagem (Detalhada)")
-        
-        botao_salvar = st.form_submit_button("Salvar no Prontuário")
-
-    if botao_salvar:
-        conn = conectar_bd()
-        conn.execute('''INSERT INTO prontuario (data, paciente, enfermeira, pa, sat, temp, evolucao) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?)''', 
-                     (data_visita.strftime("%d/%m/%Y"), paciente, enfermeira, pa, sat, temp, evolucao))
-        conn.commit()
-        conn.close()
-        st.success("✅ Registro salvo com sucesso e sincronizado!")
-
-elif aba == "Histórico de Pacientes":
-    st.subheader("📋 Consultar Prontuários")
-    
-    conn = conectar_bd()
-    df = pd.read_sql_query("SELECT * FROM prontuario ORDER BY id DESC", conn)
+# --- FUNÇÕES DE BANCO DE DATA ---
+def init_db():
+    conn = sqlite3.connect('homecare_2026.db')
+    conn.execute('''CREATE TABLE IF NOT EXISTS prontuario 
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT, paciente TEXT, 
+                  enfermeira TEXT, pa TEXT, sat INT, dor TEXT, curativo TEXT, evolucao TEXT)''')
     conn.close()
+
+def gerar_pdf(dados):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", 'B', 16)
+    pdf.cell(200, 10, "Relatorio de Atendimento Domiciliar", ln=True, align='C')
+    pdf.set_font("Arial", size=12)
+    pdf.ln(10)
+    for chave, valor in dados.items():
+        pdf.cell(200, 10, f"{chave}: {valor}", ln=True)
+    return pdf.output(dest='S').encode('latin-1')
+
+# --- INTERFACE PRINCIPAL ---
+if check_password():
+    init_db()
+    st.title("🩺 Gestão de Enfermagem Especializada")
     
-    if not df.empty:
-        # Filtro simples por paciente
-        busca = st.text_input("Buscar por nome do paciente")
-        if busca:
-            df = df[df['paciente'].str.contains(busca, case=False)]
-        
-        st.dataframe(df, use_container_width=True)
-    else:
-        st.info("Nenhum atendimento registrado até o momento.")
+    menu = st.sidebar.radio("Navegação", ["Novo Registro", "Histórico e Relatórios"])
+
+    if menu == "Novo Registro":
+        with st.form("visita"):
+            col1, col2 = st.columns(2)
+            paciente = col1.text_input("Nome do Paciente")
+            enfermeira = col2.text_input("Enfermeira Responsável")
+            
+            col3, col4, col5 = st.columns(3)
+            pa = col3.text_input("Pressão Arterial")
+            sat = col4.number_input("Saturação O2 (%)", 0, 100, 95)
+            dor = col5.selectbox("Escala de Dor", ["Sem dor", "Leve", "Moderada", "Intensa"])
+            
+            curativo = st.radio("Realizado Curativo?", ["Não", "Sim - Simples", "Sim - Complexo"])
+            evolucao = st.text_area("Evolução Clínica Detalhada")
+            
+            if st.form_submit_button("Salvar Registro"):
+                data_atual = datetime.now().strftime("%d/%m/%Y %H:%M")
+                conn = sqlite3.connect('homecare_2026.db')
+                conn.execute("INSERT INTO prontuario (data, paciente, enfermeira, pa, sat, dor, curativo, evolucao) VALUES (?,?,?,?,?,?,?,?)",
+                             (data_atual, paciente, enfermeira, pa, sat, dor, curativo, evolucao))
+                conn.commit()
+                conn.close()
+                st.success("Dados salvos com sucesso!")
+
+    elif menu == "Histórico e Relatórios":
+        conn = sqlite3.connect('homecare_2026.db')
+        df = pd.read_sql_query("SELECT * FROM prontuario ORDER BY id DESC", conn)
+        conn.close()
+
+        if not df.empty:
+            st.dataframe(df)
+            
+            st.subheader("📥 Gerar Relatório para Família")
+            id_sel = st.selectbox("Selecione o ID do atendimento", df['id'])
+            if st.button("Preparar PDF"):
+                row = df[df['id'] == id_sel].iloc[0]
+                pdf_data = {
+                    "Data": row['data'], "Paciente": row['paciente'], 
+                    "Enfermeira": row['enfermeira'], "Sinais Vitais": f"PA: {row['pa']} | Sat: {row['sat']}%",
+                    "Avaliação de Dor": row['dor'], "Procedimento": row['curativo'],
+                    "Evolução": row['evolucao']
+                }
+                pdf_output = gerar_pdf(pdf_data)
+                st.download_button(label="Baixar PDF do Atendimento", data=pdf_output, 
+                                 file_name=f"Relatorio_{row['paciente']}.pdf", mime="application/pdf")
+
+
