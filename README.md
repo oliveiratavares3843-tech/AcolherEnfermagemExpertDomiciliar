@@ -12,7 +12,5 @@ Este é um sistema especializado para o controle e gestão de atendimentos de en
 Você pode visualizar o projeto em execução aqui:  
 [https://streamlit.app](https://streamlit.app)
 
-import pandas as pd
-import sqlite3
-from datetime import datetime
+
 
