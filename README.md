@@ -10,7 +10,7 @@ Este é um sistema especializado para o controle e gestão de atendimentos de en
 
 ## 🔗 Acesse o Sistema Online
 Você pode visualizar o projeto em execução aqui:  
-[https://streamlit.app](https://streamlit.app)
+[https://sistema-enfermagem.streamlit.app/)
 
 
 
