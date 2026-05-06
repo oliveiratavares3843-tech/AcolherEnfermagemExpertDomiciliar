@@ -6,7 +6,7 @@ import io
 # 1. ESTE DEVE SER O PRIMEIRO COMANDO STREAMLIT DO ARQUIVO
 st.set_page_config(page_title="Acolher Enfermagem")
 
-# 2. ESTILO GLOBAL (CSS) - APLICA O AZUL EM TODAS AS TELAS
+# 2. ESTILO GLOBAL (CSS) - APLICA O AZUL SO NA PRIMEIRA TELA 
 st.markdown("""
     <style>
     /* Fundo azul degradê fixo */
@@ -102,7 +102,7 @@ if sistema_login():
         st.session_state.logado = False
         st.rerun()
 
-    st.title("🩺 Gestão de Enfermagem")
+    st.title("🩺 Gestão de Enfermagem Especializada")
     st.write("---")
     
     st.subheader("📝 Registrar Nova Visita")
