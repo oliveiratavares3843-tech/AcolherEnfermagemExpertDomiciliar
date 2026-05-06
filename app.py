@@ -2,9 +2,8 @@ import streamlit as st
 from fpdf import FPDF
 
 # --- 1. CONFIGURAÇÃO DE SEGURANÇA (LOGIN) ---
-# Altere o usuário e senha abaixo para sua preferência
 USUARIO_SISTEMA = "acolher"
-SENHA_SISTEMA = "enfermagem2024"
+SENHA_SISTEMA = "enfermagem2027"
 
 def sistema_login():
     if "logado" not in st.session_state:
@@ -12,8 +11,8 @@ def sistema_login():
 
     if not st.session_state.logado:
         st.markdown("<h2 style='text-align: center;'>🔐 Acesso ao Sistema</h2>", unsafe_allow_html=True)
-        col_login, col_vazia = st.columns([1, 1])
-        with col_login:
+        col1, col2, col3 = st.columns([1,2,1])
+        with col2:
             usuario = st.text_input("Usuário")
             senha = st.text_input("Senha", type="password")
             if st.button("Entrar"):
@@ -25,13 +24,13 @@ def sistema_login():
         return False
     return True
 
-# --- 2. FUNÇÃO PARA GERAR O PDF (CORRIGIDA) ---
+# --- 2. FUNÇÃO PARA GERAR O PDF (CORREÇÃO DEFINITIVA) ---
 def gerar_pdf(dados):
-    # Usando latin-1 para compatibilidade básica de acentos
+    # Usamos o FPDF padrão
     pdf = FPDF()
     pdf.add_page()
     
-    # Inserindo Logotipo (Certifique-se de ter o arquivo logo.png no GitHub)
+    # Tentativa de colocar o logotipo
     try:
         pdf.image("logo.png", 10, 8, 33) 
     except:
@@ -48,27 +47,24 @@ def gerar_pdf(dados):
     pdf.cell(0, 10, txt=f"Paciente: {dados['paciente']}", ln=True)
     pdf.cell(0, 10, txt=f"Enfermeiro(a): {dados['enfermeiro']}", ln=True)
     
-    # Sinais Vitais (com borda)
+    # Sinais Vitais
     pdf.ln(5)
     pdf.set_font("Arial", '', 12)
     sinais = f"PA: {dados['pa']} | SatO2: {dados['saturacao']}% | Dor: {dados['dor']}"
     pdf.cell(0, 10, txt=sinais, ln=True, border=1, align='C')
     
-    # Evolução Clínica com multi_cell (essencial para quebra de linha)
+    # Evolução Clínica (Quebra de linha automática)
     pdf.ln(10)
     pdf.set_font("Arial", 'B', 12)
     pdf.cell(0, 10, txt="Evolução Clínica Detalhada:", ln=True)
     pdf.set_font("Arial", '', 12)
-    
-    # multi_cell resolve o problema de textos longos
     pdf.multi_cell(w=0, h=8, txt=dados['evolucao'], border=0, align='J')
     
-    # RETORNO CORRIGIDO: Removido o .encode() que causava o erro de bytearray
-    return pdf.output()
+    # AJUSTE AQUI: Convertendo bytearray para bytes explicitamente
+    return bytes(pdf.output())
 
 # --- 3. INTERFACE DO APLICATIVO ---
 if sistema_login():
-    # Barra lateral com botão de sair
     st.sidebar.title("Menu")
     if st.sidebar.button("Sair"):
         st.session_state.logado = False
@@ -78,7 +74,6 @@ if sistema_login():
     st.write("---")
     st.subheader("Registrar Nova Visita")
 
-    # Layout dos campos
     col1, col2 = st.columns(2)
     with col1:
         nome_paciente = st.text_input("Nome do Paciente")
@@ -102,20 +97,19 @@ if sistema_login():
                     "evolucao": evolucao_texto
                 }
                 
-                # Gera o PDF
-                pdf_output = gerar_pdf(dados_visita)
+                # O pdf_output agora virá como bytes puros
+                pdf_bytes = gerar_pdf(dados_visita)
                 
                 st.success("✅ Relatório gerado com sucesso!")
                 
-                # Botão para baixar
                 st.download_button(
                     label="📥 Baixar Documento PDF",
-                    data=pdf_output,
+                    data=pdf_bytes,
                     file_name=f"atendimento_{nome_paciente}.pdf",
                     mime="application/pdf"
                 )
             except Exception as e:
-                st.error(f"Erro inesperado: {e}")
+                st.error(f"Erro ao processar PDF: {e}")
         else:
-            st.warning("⚠️ Preencha o nome do paciente e a evolução clínica.")
+            st.warning("⚠️ Preencha os campos obrigatórios.")
 
