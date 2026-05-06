@@ -3,19 +3,23 @@ from fpdf import FPDF
 from PIL import Image
 import io
 
-# 1. CONFIGURAÇÃO INICIAL
+# 1. CONFIGURAÇÃO INICIAL (DEVE SER O PRIMEIRO COMANDO)
 st.set_page_config(page_title="Acolher Enfermagem")
 
-# 2. ESTILO DOS BOTÕES (Global - para manter os botões bonitos em todo o sistema)
+# 2. ESTILO DOS BOTÕES E CAMPOS (GLOBAL)
 st.markdown("""
     <style>
+    /* Botões em azul forte arredondados */
     .stButton > button {
         background-color: #005DAE !important;
         color: white !important;
         border-radius: 20px !important;
         font-weight: bold !important;
         border: none !important;
+        height: 3em;
+        width: 100%;
     }
+    /* Campos de texto arredondados */
     .stTextInput > div > div > input {
         border-radius: 10px !important;
     }
@@ -24,14 +28,14 @@ st.markdown("""
 
 # --- CONFIGURAÇÃO DE SEGURANÇA ---
 USUARIO_SISTEMA = "acolher"
-SENHA_SISTEMA = "enfermagem2024"
+SENHA_SISTEMA = "enfermagem2026"
 
 def sistema_login():
     if "logado" not in st.session_state:
         st.session_state.logado = False
 
     if not st.session_state.logado:
-        # --- ESTILO SÓ DA TELA DE LOGIN (AZUL) ---
+        # --- ESTILO EXCLUSIVO DA TELA DE LOGIN (FUNDO AZUL) ---
         st.markdown("""
             <style>
             .stApp {
@@ -41,14 +45,15 @@ def sistema_login():
             </style>
             """, unsafe_allow_html=True)
 
-        # Centralizando o ícone na entrada
+        # Centralizando o Ícone Médico (Link Corrigido)
         col_img1, col_img2, col_img3 = st.columns([1,1,1])
         with col_img2:
-            # Ícone de enfermeira
+            # Ícone de estetoscópio azul fixo
             st.image("https://flaticon.com", width=120)
 
-        st.markdown("<h2 style='text-align: center; color: #005DAE;'>💙 Acesso ao Sistema</h2>", unsafe_allow_html=True)
+        st.markdown("<h2 style='text-align: center; color: #005DAE; font-family: sans-serif;'>💙 Acesso ao Sistema</h2>", unsafe_allow_html=True)
         
+        # Caixa de Login
         col1, col2, col3 = st.columns([1,2,1])
         with col2:
             usuario = st.text_input("Usuário")
@@ -62,10 +67,11 @@ def sistema_login():
         return False
     return True
 
-# --- FUNÇÃO DO PDF ---
+# --- FUNÇÃO PARA GERAR O PDF ---
 def gerar_pdf(dados, arquivo_logo):
     pdf = FPDF()
     pdf.add_page()
+    
     if arquivo_logo is not None:
         try:
             img = Image.open(arquivo_logo)
@@ -80,23 +86,27 @@ def gerar_pdf(dados, arquivo_logo):
     pdf.ln(25) 
     pdf.cell(0, 10, txt="Relatorio de Atendimento Domiciliar", ln=True, align='C')
     pdf.ln(10)
+    
     pdf.set_font("Arial", 'B', 12)
     pdf.cell(0, 10, txt=f"Paciente: {dados['paciente']}", ln=True)
     pdf.cell(0, 10, txt=f"Enfermeiro(a): {dados['enfermeiro']}", ln=True)
+    
     pdf.ln(5)
     pdf.set_font("Arial", '', 12)
     sinais = f"PA: {dados['pa']} | SatO2: {dados['saturacao']}% | Dor: {dados['dor']}"
     pdf.cell(0, 10, txt=sinais, ln=True, border=1, align='C')
+    
     pdf.ln(10)
     pdf.set_font("Arial", 'B', 12)
     pdf.cell(0, 10, txt="Evolucao Clinica Detalhada:", ln=True)
     pdf.set_font("Arial", '', 12)
     pdf.multi_cell(w=0, h=8, txt=dados['evolucao'], border=0, align='J')
+    
     return bytes(pdf.output())
 
-# --- INTERFACE PRINCIPAL (APÓS LOGIN - FUNDO BRANCO) ---
+# --- INTERFACE PRINCIPAL (PÓS-LOGIN - TELA BRANCA) ---
 if sistema_login():
-    # Quando o código chega aqui, o estilo .stApp azul não é mais aplicado
+    # Barra Lateral
     st.sidebar.markdown("### ⚙️ Painel de Controle")
     logo_carregada = st.sidebar.file_uploader("Logotipo da Empresa", type=["png", "jpg", "jpeg"])
     
@@ -105,6 +115,7 @@ if sistema_login():
         st.session_state.logado = False
         st.rerun()
 
+    # Conteúdo Principal (Fundo Branco Padrão)
     st.title("🩺 Gestão de Enfermagem")
     st.write("---")
     
@@ -119,9 +130,9 @@ if sistema_login():
         saturacao = st.number_input("Saturação O2 (%)", 0, 100, 95)
 
     dor = st.selectbox("Escala de Dor", ["Sem dor", "Leve", "Moderada", "Intensa"])
-    evolucao_texto = st.text_area("Evolução Clínica Detalhada", height=200)
+    evolucao_texto = st.text_area("Evolução Clínica Detalhada", height=250)
 
-    if st.button("🚀 Gerar Relatório"):
+    if st.button("🚀 Gerar Relatório PDF"):
         if nome_paciente and evolucao_texto:
             try:
                 dados_visita = {
@@ -129,14 +140,14 @@ if sistema_login():
                     "pa": pa, "saturacao": f"{saturacao}", "dor": dor, "evolucao": evolucao_texto
                 }
                 pdf_bytes = gerar_pdf(dados_visita, logo_carregada)
-                st.success("✅ Relatório gerado!")
+                st.success("✅ Relatório gerado com sucesso!")
                 st.download_button(
-                    label="📥 Baixar PDF",
+                    label="📥 Baixar Documento PDF",
                     data=pdf_bytes,
                     file_name=f"atendimento_{nome_paciente}.pdf",
                     mime="application/pdf"
                 )
             except Exception as e:
-                st.error(f"Erro: {e}")
+                st.error(f"Erro ao gerar o arquivo: {e}")
         else:
-            st.warning("⚠️ Preencha os campos obrigatórios.")
+            st.warning("⚠️ Preencha o nome do paciente e a evolução clínica.")
