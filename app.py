@@ -3,19 +3,12 @@ from fpdf import FPDF
 from PIL import Image
 import io
 
-# 1. ESTE DEVE SER O PRIMEIRO COMANDO STREAMLIT DO ARQUIVO
+# 1. CONFIGURAÇÃO INICIAL
 st.set_page_config(page_title="Acolher Enfermagem")
 
-# 2. ESTILO GLOBAL (CSS) - APLICA O AZUL SO NA PRIMEIRA TELA 
+# 2. ESTILO DOS BOTÕES (Global - para manter os botões bonitos em todo o sistema)
 st.markdown("""
     <style>
-    /* Fundo azul degradê fixo */
-    .stApp {
-        background: linear-gradient(180deg, #A2D9FF 0%, #FFFFFF 100%) !important;
-        background-attachment: fixed;
-    }
-    
-    /* Botões em azul forte */
     .stButton > button {
         background-color: #005DAE !important;
         color: white !important;
@@ -23,8 +16,6 @@ st.markdown("""
         font-weight: bold !important;
         border: none !important;
     }
-
-    /* Arredondamento das caixas de texto */
     .stTextInput > div > div > input {
         border-radius: 10px !important;
     }
@@ -33,16 +24,27 @@ st.markdown("""
 
 # --- CONFIGURAÇÃO DE SEGURANÇA ---
 USUARIO_SISTEMA = "acolher"
-SENHA_SISTEMA = "enfermagem2026"
+SENHA_SISTEMA = "enfermagem2024"
 
 def sistema_login():
     if "logado" not in st.session_state:
         st.session_state.logado = False
 
     if not st.session_state.logado:
+        # --- ESTILO SÓ DA TELA DE LOGIN (AZUL) ---
+        st.markdown("""
+            <style>
+            .stApp {
+                background: linear-gradient(180deg, #A2D9FF 0%, #FFFFFF 100%) !important;
+                background-attachment: fixed;
+            }
+            </style>
+            """, unsafe_allow_html=True)
+
         # Centralizando o ícone na entrada
         col_img1, col_img2, col_img3 = st.columns([1,1,1])
         with col_img2:
+            # Ícone de enfermeira
             st.image("https://flaticon.com", width=120)
 
         st.markdown("<h2 style='text-align: center; color: #005DAE;'>💙 Acesso ao Sistema</h2>", unsafe_allow_html=True)
@@ -92,8 +94,9 @@ def gerar_pdf(dados, arquivo_logo):
     pdf.multi_cell(w=0, h=8, txt=dados['evolucao'], border=0, align='J')
     return bytes(pdf.output())
 
-# --- INTERFACE PRINCIPAL (APÓS LOGIN) ---
+# --- INTERFACE PRINCIPAL (APÓS LOGIN - FUNDO BRANCO) ---
 if sistema_login():
+    # Quando o código chega aqui, o estilo .stApp azul não é mais aplicado
     st.sidebar.markdown("### ⚙️ Painel de Controle")
     logo_carregada = st.sidebar.file_uploader("Logotipo da Empresa", type=["png", "jpg", "jpeg"])
     
@@ -102,7 +105,7 @@ if sistema_login():
         st.session_state.logado = False
         st.rerun()
 
-    st.title("🩺 Gestão de Enfermagem Especializada")
+    st.title("🩺 Gestão de Enfermagem")
     st.write("---")
     
     st.subheader("📝 Registrar Nova Visita")
@@ -137,4 +140,3 @@ if sistema_login():
                 st.error(f"Erro: {e}")
         else:
             st.warning("⚠️ Preencha os campos obrigatórios.")
-
