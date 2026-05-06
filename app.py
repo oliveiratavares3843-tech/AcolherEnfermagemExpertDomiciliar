@@ -1,9 +1,11 @@
 import streamlit as st
 from fpdf import FPDF
+from PIL import Image
+import io
 
 # --- 1. CONFIGURAÇÃO DE SEGURANÇA (LOGIN) ---
 USUARIO_SISTEMA = "acolher"
-SENHA_SISTEMA = "enfermagem2027"
+SENHA_SISTEMA = "enfermagem2024"
 
 def sistema_login():
     if "logado" not in st.session_state:
@@ -24,21 +26,26 @@ def sistema_login():
         return False
     return True
 
-# --- 2. FUNÇÃO PARA GERAR O PDF (CORREÇÃO DEFINITIVA) ---
-def gerar_pdf(dados):
-    # Usamos o FPDF padrão
+# --- 2. FUNÇÃO PARA GERAR O PDF COM LOGO DINÂMICO ---
+def gerar_pdf(dados, arquivo_logo):
     pdf = FPDF()
     pdf.add_page()
     
-    # Tentativa de colocar o logotipo
-    try:
-        pdf.image("logo.png", 10, 8, 33) 
-    except:
-        pass 
+    # Se o usuário carregou uma imagem, insere no PDF
+    if arquivo_logo is not None:
+        try:
+            # Usamos a biblioteca PIL para abrir a imagem do upload
+            img = Image.open(arquivo_logo)
+            # Salvamos temporariamente em memória para o FPDF ler
+            img_byte_arr = io.BytesIO()
+            img.save(img_byte_arr, format=img.format)
+            pdf.image(img_byte_arr, 10, 8, 33)
+        except Exception as e:
+            st.error(f"Erro ao processar imagem: {e}")
 
     # Cabeçalho
     pdf.set_font("Arial", 'B', 16)
-    pdf.ln(20) 
+    pdf.ln(25) 
     pdf.cell(0, 10, txt="Relatório de Atendimento Domiciliar", ln=True, align='C')
     pdf.ln(10)
     
@@ -53,14 +60,13 @@ def gerar_pdf(dados):
     sinais = f"PA: {dados['pa']} | SatO2: {dados['saturacao']}% | Dor: {dados['dor']}"
     pdf.cell(0, 10, txt=sinais, ln=True, border=1, align='C')
     
-    # Evolução Clínica (Quebra de linha automática)
+    # Evolução Clínica
     pdf.ln(10)
     pdf.set_font("Arial", 'B', 12)
     pdf.cell(0, 10, txt="Evolução Clínica Detalhada:", ln=True)
     pdf.set_font("Arial", '', 12)
     pdf.multi_cell(w=0, h=8, txt=dados['evolucao'], border=0, align='J')
     
-    # AJUSTE AQUI: Convertendo bytearray para bytes explicitamente
     return bytes(pdf.output())
 
 # --- 3. INTERFACE DO APLICATIVO ---
@@ -71,6 +77,12 @@ if sistema_login():
         st.rerun()
 
     st.title("🩺 Gestão de Enfermagem Especializada")
+    st.write("---")
+    
+    # --- NOVO: CAMPO PARA BUSCAR LOGOTIPO NO COMPUTADOR ---
+    st.subheader("Configuração do Relatório")
+    logo_carregada = st.file_uploader("Selecione o logotipo da empresa (PNG ou JPG)", type=["png", "jpg", "jpeg"])
+    
     st.write("---")
     st.subheader("Registrar Nova Visita")
 
@@ -97,8 +109,8 @@ if sistema_login():
                     "evolucao": evolucao_texto
                 }
                 
-                # O pdf_output agora virá como bytes puros
-                pdf_bytes = gerar_pdf(dados_visita)
+                # Passamos a logo carregada para a função
+                pdf_bytes = gerar_pdf(dados_visita, logo_carregada)
                 
                 st.success("✅ Relatório gerado com sucesso!")
                 
@@ -109,7 +121,7 @@ if sistema_login():
                     mime="application/pdf"
                 )
             except Exception as e:
-                st.error(f"Erro ao processar PDF: {e}")
+                st.error(f"Erro ao gerar o arquivo: {e}")
         else:
             st.warning("⚠️ Preencha os campos obrigatórios.")
 
