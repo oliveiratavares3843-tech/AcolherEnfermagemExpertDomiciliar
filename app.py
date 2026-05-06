@@ -5,7 +5,7 @@ import io
 
 # --- 1. CONFIGURAÇÃO DE SEGURANÇA (LOGIN) ---
 USUARIO_SISTEMA = "acolher"
-SENHA_SISTEMA = "enfermagem2024"
+SENHA_SISTEMA = "enfermagem2026"
 
 def sistema_login():
     if "logado" not in st.session_state:
