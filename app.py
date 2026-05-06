@@ -1,80 +1,84 @@
 import streamlit as st
 from fpdf import FPDF
 
-# --- CONFIGURAÇÃO DE LOGIN ---
-# Defina aqui seu usuário e senha
-USUARIO_CORRETO = "admin"
-SENHA_CORRETA = "enfermagem123"
+# --- 1. CONFIGURAÇÃO DE SEGURANÇA (LOGIN) ---
+# Altere o usuário e senha abaixo para sua preferência
+USUARIO_SISTEMA = "acolher"
+SENHA_SISTEMA = "enfermagem2024"
 
-def verificar_login():
-    if "autenticado" not in st.session_state:
-        st.session_state.autenticado = False
+def sistema_login():
+    if "logado" not in st.session_state:
+        st.session_state.logado = False
 
-    if not st.session_state.autenticado:
-        st.title("🔐 Acesso Restrito")
-        usuario = st.text_input("Usuário")
-        senha = st.text_input("Senha", type="password")
-        
-        if st.button("Entrar"):
-            if usuario == USUARIO_CORRETO and senha == SENHA_CORRETA:
-                st.session_state.autenticado = True
-                st.rerun()
-            else:
-                st.error("Usuário ou senha incorretos.")
+    if not st.session_state.logado:
+        st.markdown("<h2 style='text-align: center;'>🔐 Acesso ao Sistema</h2>", unsafe_allow_html=True)
+        col_login, col_vazia = st.columns([1, 1])
+        with col_login:
+            usuario = st.text_input("Usuário")
+            senha = st.text_input("Senha", type="password")
+            if st.button("Entrar"):
+                if usuario == USUARIO_SISTEMA and senha == SENHA_SISTEMA:
+                    st.session_state.logado = True
+                    st.rerun()
+                else:
+                    st.error("Usuário ou senha incorretos.")
         return False
     return True
 
-# --- FUNÇÃO PARA GERAR PDF ---
+# --- 2. FUNÇÃO PARA GERAR O PDF (CORRIGIDA) ---
 def gerar_pdf(dados):
+    # Usando latin-1 para compatibilidade básica de acentos
     pdf = FPDF()
     pdf.add_page()
     
-    # Inserindo Logotipo (Verifica se o arquivo existe para não travar)
+    # Inserindo Logotipo (Certifique-se de ter o arquivo logo.png no GitHub)
     try:
-        # Altere "logo.png" para o nome real do seu arquivo no GitHub
         pdf.image("logo.png", 10, 8, 33) 
     except:
-        pass # Se não achar a imagem, ignora e segue
+        pass 
 
     # Cabeçalho
     pdf.set_font("Arial", 'B', 16)
     pdf.ln(20) 
-    pdf.cell(0, 10, txt="Relatório de Atendimento de Enfermagem", ln=True, align='C')
+    pdf.cell(0, 10, txt="Relatório de Atendimento Domiciliar", ln=True, align='C')
     pdf.ln(10)
     
-    # Dados Principais
+    # Dados do Paciente e Enfermeiro
     pdf.set_font("Arial", 'B', 12)
     pdf.cell(0, 10, txt=f"Paciente: {dados['paciente']}", ln=True)
-    pdf.cell(0, 10, txt=f"Enfermeiro(a) Responsável: {dados['enfermeiro']}", ln=True)
+    pdf.cell(0, 10, txt=f"Enfermeiro(a): {dados['enfermeiro']}", ln=True)
     
     # Sinais Vitais (com borda)
     pdf.ln(5)
     pdf.set_font("Arial", '', 12)
-    sinais = f"PA: {dados['pa']} | Saturação: {dados['saturacao']}% | Escala de Dor: {dados['dor']}"
+    sinais = f"PA: {dados['pa']} | SatO2: {dados['saturacao']}% | Dor: {dados['dor']}"
     pdf.cell(0, 10, txt=sinais, ln=True, border=1, align='C')
     
-    # Evolução Clínica com multi_cell (Quebra de linha automática)
+    # Evolução Clínica com multi_cell (essencial para quebra de linha)
     pdf.ln(10)
     pdf.set_font("Arial", 'B', 12)
     pdf.cell(0, 10, txt="Evolução Clínica Detalhada:", ln=True)
     pdf.set_font("Arial", '', 12)
+    
+    # multi_cell resolve o problema de textos longos
     pdf.multi_cell(w=0, h=8, txt=dados['evolucao'], border=0, align='J')
     
-    # Rodapé simples com data
-    pdf.ln(20)
-    pdf.set_font("Arial", 'I', 8)
-    pdf.cell(0, 10, txt="Documento gerado pelo Sistema de Gestão de Enfermagem.", align='C')
-    
-    return pdf.output(dest='S').encode('latin-1')
+    # RETORNO CORRIGIDO: Removido o .encode() que causava o erro de bytearray
+    return pdf.output()
 
-# --- EXECUÇÃO DO APP ---
-if verificar_login():
-    # Só mostra o conteúdo abaixo se o login estiver correto
-    st.sidebar.button("Sair", on_click=lambda: st.session_state.update({"autenticado": False}))
-    
+# --- 3. INTERFACE DO APLICATIVO ---
+if sistema_login():
+    # Barra lateral com botão de sair
+    st.sidebar.title("Menu")
+    if st.sidebar.button("Sair"):
+        st.session_state.logado = False
+        st.rerun()
+
     st.title("🩺 Gestão de Enfermagem Especializada")
+    st.write("---")
     st.subheader("Registrar Nova Visita")
 
+    # Layout dos campos
     col1, col2 = st.columns(2)
     with col1:
         nome_paciente = st.text_input("Nome do Paciente")
@@ -88,27 +92,30 @@ if verificar_login():
 
     if st.button("Gerar Relatório PDF"):
         if nome_paciente and evolucao_texto:
-            dados_visita = {
-                "paciente": nome_paciente, "enfermeiro": enfermeiro,
-                "pa": pa, "saturacao": saturacao, "dor": dor, "evolucao": evolucao_texto
-            }
-            
             try:
-                pdf_bytes = gerar_pdf(dados_visita)
-                st.success("PDF pronto!")
+                dados_visita = {
+                    "paciente": nome_paciente, 
+                    "enfermeiro": enfermeiro,
+                    "pa": pa, 
+                    "saturacao": saturacao, 
+                    "dor": dor, 
+                    "evolucao": evolucao_texto
+                }
+                
+                # Gera o PDF
+                pdf_output = gerar_pdf(dados_visita)
+                
+                st.success("✅ Relatório gerado com sucesso!")
+                
+                # Botão para baixar
                 st.download_button(
-                    label="📥 Baixar Relatório",
-                    data=pdf_bytes,
-                    file_name=f"relatorio_{nome_paciente}.pdf",
+                    label="📥 Baixar Documento PDF",
+                    data=pdf_output,
+                    file_name=f"atendimento_{nome_paciente}.pdf",
                     mime="application/pdf"
                 )
             except Exception as e:
-                st.error(f"Erro ao gerar PDF: {e}")
+                st.error(f"Erro inesperado: {e}")
         else:
-            st.warning("Preencha os campos obrigatórios (Nome e Evolução).")
-
-
-
-
-
+            st.warning("⚠️ Preencha o nome do paciente e a evolução clínica.")
 
