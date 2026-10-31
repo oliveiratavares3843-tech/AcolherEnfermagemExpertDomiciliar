@@ -1,54 +1,45 @@
-# Sistema de Gestão de Enfermagem Expert Domiciliar
+Home Nursing Management System Expert Domiciliar
+This is a production-level system specialized for the control, triage, and management of home nursing care. The application was developed focusing on precision, agility in patient monitoring, and the integrity of clinical data.
 
-Este é um sistema de nível de produção especializado para o controle, triagem e gestão de atendimentos de enfermagem domiciliar. A aplicação foi desenvolvida focando em precisão, agilidade no acompanhamento de pacientes e integridade dos dados clínicos.
+🚀 Access the System Online
+The application is deployed and ready for production use via the link below:
+🔗 Access the application in real-time
 
-## 🚀 Acesse o Sistema Online
-O sistema está implantado e pronto para uso em produção através do link abaixo:
-🔗 [Acesse a aplicação em tempo real](https://streamlit.app)
+🛠️ Architecture and Technologies Used
+The application was structured following software development best practices, clearly separating the presentation, business logic, and data persistence layers.
 
----
+Python (System Core): Main language used to implement complex business rules, triage workflows, and secure manipulation of health data.
 
-## 🛠️ Arquitetura e Tecnologias Utilizadas
+Streamlit (Front-end & Dashboard): A reactive user interface optimized for the workflow of healthcare professionals, enabling rapid decision-making through clean visualizations.
 
-A aplicação foi estruturada seguindo boas práticas de desenvolvimento de software, separando de forma clara as camadas de apresentação, lógica de negócios e persistência de dados.
+Pandas (Data Engineering): Used for the efficient manipulation, modeling, filtering, and organization of structured patient data structures.
 
-* **Python (Core do Sistema):** Linguagem principal utilizada para implementar as regras de negócio complexas, fluxos de triagem e manipulação segura de dados de saúde.
-* **Streamlit (Front-end & Dashboard):** Interface do usuário reativa e otimizada para o fluxo de trabalho de profissionais de saúde, permitindo tomadas de decisão rápidas através de visualizações limpas.
-* **Pandas (Engenharia de Dados):** Utilizado para a manipulação, modelagem, filtragem e organização eficiente das estruturas de dados estruturados dos pacientes.
-* **SQLite (Persistência & Banco de Dados):** Banco de dados relacional robusto configurado para garantir o armazenamento seguro, transações confiáveis e integridade referencial das informações médicas confidenciais.
+SQLite (Persistence & Database): A robust relational database configured to ensure secure storage, reliable transactions, and referential integrity of confidential medical information.
 
----
+🏗️ Engineering Patterns and Solved Challenges
+1. Data Modeling and Relational Consistency
+The Python backend was integrated with SQLite using data modeling best practices (such as primary keys, foreign keys, and integrity constraints). This ensures that clinical histories, medical records, and progress notes remain permanently linked to the correct patient, preventing overlapping data errors for sensitive information.
 
-## 🏗️ Padrões de Engenharia e Desafios Resolvidos
+2. State Management and Reactivity
+Through Streamlit, an architecture was implemented to handle session state management efficiently. The system updates care dashboards and triage reports in real-time as new nursing records are entered, without requiring heavy full-page reloads.
 
-### 1. Modelagem de Dados e Consistência Relacional
-O back-end em Python foi integrado ao **SQLite** utilizando boas práticas de modelagem de dados (como chaves primárias, estrangeiras e restrições de integridade). Isso garante que o histórico clínico, prontuários e evoluções médicas fiquem permanentemente vinculados ao paciente correto, impedindo falhas de sobreposição de dados sensíveis.
+3. Input Security and Validation
+The application features data validation layers using Python to ensure that critical fields (such as vital signs, dosages, and identification data) are entered in the correct format before reaching the database layer, mitigating human operational errors.
 
-### 2. Gerenciamento de Estado e Reatividade
-Através do **Streamlit**, foi implementada uma arquitetura que lida com o gerenciamento de estado da sessão de forma eficiente. O sistema atualiza os dashboards de atendimento e relatórios de triagem em tempo real à medida que novos registros de enfermagem são inseridos, sem a necessidade de recargas totais pesadas na página.
+📦 How to Run the Project Locally
+Clone the repository:
 
-### 3. Segurança e Validação de Inputs
-A aplicação conta com camadas de validação de dados utilizando Python para garantir que campos críticos (como sinais vitais, dosagens e dados de identificação) sejam inseridos no formato correto antes de atingirem a camada do banco de dados, mitigando erros humanos na operação.
+Bash
+git clone https://github.com
+Enter the project directory:
 
----
+Bash
+cd AcolhimentoEnfermagemExpertDomiciliar
+Install the dependencies listed in requirements.txt:
 
-## 📦 Como Executar o Projeto Localmente
+Bash
+pip install -r requirements.txt
+Run the application:
 
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com
-   ```
-2. Entre no diretório do projeto:
-   ```bash
-   cd AcolhimentoEnfermagemExpertDomiciliar
-   ```
-3. Instale as dependências listadas no `requirements.txt`:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Execute a aplicação:
-   ```bash
-   streamlit run app.py
-   ```
-
-linkedink
+Bash
+streamlit run app.py
