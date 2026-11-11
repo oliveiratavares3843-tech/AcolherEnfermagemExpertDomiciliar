@@ -29,17 +29,25 @@ The application features data validation layers using Python to ensure that crit
 📦 How to Run the Project Locally
 Clone the repository:
 
-Bash
+### 🚀 How to Run the Project Locally
+
+Clone the repository:
+```bash
 git clone https://github.com
+```
+
 Enter the project directory:
-
-Bash
+```bash
 cd AcolhimentoEnfermagemExpertDomiciliar
+```
+
 Install the dependencies listed in requirements.txt:
-
-Bash
+```bash
 pip install -r requirements.txt
-Run the application:
+```
 
-Bash
+Run the application:
+```bash
 streamlit run app.py
+```
+
