@@ -1,63 +1,53 @@
-## 🌐 Live Demo
+# 🩺 Home Care Nursing System
 
-You can test the application live in production here:
-👉 **[Deploy on Streamlit Cloud](https://sistema-enfermagem.streamlit.app)**
+A specialized clinical management and automated medical reporting web application built with **Python**, **Streamlit**, **FPDF**, and **Pillow**. Tailored for home care nursing professionals to record patient vitals, document clinical evolutions, and export branded PDF reports.
 
- --- 1. SECURITY CONFIGURATION (LOGIN) ---
-SYSTEM_USER = "acolher"
-SYSTEM_PASSWORD = "enfermagem2026"
+🔗 **Live Demo:** [https://sistema-enfermagem.streamlit.app/]
 
+---
 
-Home Nursing Management System Expert Domiciliar
-This is a production-level system specialized for the control, triage, and management of home nursing care. The application was developed focusing on precision, agility in patient monitoring, and the integrity of clinical data.
+## 🔐 Demo Credentials (For Recruiters & Evaluators)
 
-🚀 Access the System Online
-The application is deployed and ready for production use via the link below:
-🔗 Access the application in real-time
+Use the credentials below to access the clinical portal and test PDF report generation:
 
-🛠️ Architecture and Technologies Used
-The application was structured following software development best practices, clearly separating the presentation, business logic, and data persistence layers.
+* **Username:** `recruiter`
+* **Password:** `nurse2026`
 
-Python (System Core): Main language used to implement complex business rules, triage workflows, and secure manipulation of health data.
+---
 
-Streamlit (Front-end & Dashboard): A reactive user interface optimized for the workflow of healthcare professionals, enabling rapid decision-making through clean visualizations.
+## ✨ Key Features
 
-Pandas (Data Engineering): Used for the efficient manipulation, modeling, filtering, and organization of structured patient data structures.
+* **Context-Aware UI Styling:** Custom healthcare-themed gradient interface on the Welcome and Login screens that transitions to a clean, high-contrast clinical workspace upon authentication.
+* **Vital Signs & Clinical Tracking:** Structured capture of Blood Pressure (BP), Oxygen Saturation (SpO2), Pain Scale levels, and detailed nursing notes.
+* **Automated PDF Report Generation:** Dynamically compiles patient data, vitals, clinical notes, and custom company logos into downloadable A4 PDF documents.
+* **Character Encoding Resilience:** Built-in `latin-1` fallback handling to prevent PDF rendering failures with special characters.
 
-SQLite (Persistence & Database): A robust relational database configured to ensure secure storage, reliable transactions, and referential integrity of confidential medical information.
+---
 
-🏗️ Engineering Patterns and Solved Challenges
-1. Data Modeling and Relational Consistency
-The Python backend was integrated with SQLite using data modeling best practices (such as primary keys, foreign keys, and integrity constraints). This ensures that clinical histories, medical records, and progress notes remain permanently linked to the correct patient, preventing overlapping data errors for sensitive information.
+## 🛠️ Tech Stack
 
-2. State Management and Reactivity
-Through Streamlit, an architecture was implemented to handle session state management efficiently. The system updates care dashboards and triage reports in real-time as new nursing records are entered, without requiring heavy full-page reloads.
+* **Language:** Python 3.x
+* **Framework:** Streamlit
+* **PDF Engine:** FPDF
+* **Image Processing:** Pillow (PIL)
 
-3. Input Security and Validation
-The application features data validation layers using Python to ensure that critical fields (such as vital signs, dosages, and identification data) are entered in the correct format before reaching the database layer, mitigating human operational errors.
+---
 
-📦 How to Run the Project Locally
-Clone the repository:
+## 🚀 How to Run Locally
 
-### 🚀 How to Run the Project Locally
+1. Clone the repository:
+   ```bash
+   git clone https://github.com
+   cd home-care-nursing-system
+   ```
 
-Clone the repository:
-```bash
-git clone https://github.com
-```
+2. Install dependencies:
+   ```bash
+   pip install streamlit fpdf pillow
+   ```
 
-Enter the project directory:
-```bash
-cd AcolhimentoEnfermagemExpertDomiciliar
-```
-
-Install the dependencies listed in requirements.txt:
-```bash
-pip install -r requirements.txt
-```
-
-Run the application:
-```bash
-streamlit run app.py
-```
+3. Run the application:
+   ```bash
+   streamlit run app.py
+   ```
 
