@@ -1,3 +1,8 @@
+## 🌐 Live Demo
+
+You can test the application live in production here:
+👉 **[Deploy on Streamlit Cloud](https://sistema-enfermagem.streamlit.app)**
+
 Home Nursing Management System Expert Domiciliar
 This is a production-level system specialized for the control, triage, and management of home nursing care. The application was developed focusing on precision, agility in patient monitoring, and the integrity of clinical data.
 
