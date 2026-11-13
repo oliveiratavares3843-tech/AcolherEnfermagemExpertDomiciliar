@@ -1,8 +1,13 @@
 # 🩺 Home Care Nursing System
 
+![Python](https://shields.io)
+![Streamlit](https://shields.io)
+![FPDF](https://shields.io)
+![Pillow](https://shields.io)
+
 A specialized clinical management and automated medical reporting web application built with **Python**, **Streamlit**, **FPDF**, and **Pillow**. Tailored for home care nursing professionals to record patient vitals, document clinical evolutions, and export branded PDF reports.
 
-🔗 **Live Demo:** [https://sistema-enfermagem.streamlit.app/]
+🔗 **Live Demo:** **[Access the Clinical Portal](https://sistema-enfermagem.streamlit.app/)**
 
 ---
 
@@ -26,7 +31,7 @@ Use the credentials below to access the clinical portal and test PDF report gene
 
 ## 🛠️ Tech Stack
 
-* **Language:** Python 3.x
+* **Language:** Python 3
 * **Framework:** Streamlit
 * **PDF Engine:** FPDF
 * **Image Processing:** Pillow (PIL)
@@ -38,16 +43,15 @@ Use the credentials below to access the clinical portal and test PDF report gene
 1. Clone the repository:
    ```bash
    git clone https://github.com
-   cd home-care-nursing-system
+   cd AcolherEnfermagemExpertDomiciliar
    ```
 
 2. Install dependencies:
    ```bash
-   pip install streamlit fpdf pillow
+   pip install -r requirements.txt
    ```
 
 3. Run the application:
    ```bash
    streamlit run app.py
    ```
-
