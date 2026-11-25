@@ -54,15 +54,15 @@ def login_screen():
     apply_welcome_style()
     st.markdown("<h1 style='text-align: center; font-size: 70px;'>🩺</h1>", unsafe_allow_html=True)
     st.markdown("<h2 style='text-align: center; color: #005DAE;'>💙 System Access</h2>", unsafe_allow_html=True)
-    
+   
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         # Visible demo credentials for recruiters
         st.info("👋 **Recruiter / Visitor Demo Access:**\n\n* **Username:** `recruiter`\n* **Password:** `nurse2026`")
-        
+       
         username = st.text_input("Username")
         password = st.text_input("Password", type="password")
-        
+       
         if st.button("Login"):
             secrets_users = st.secrets.get("usuarios", {}) if hasattr(st, "secrets") else {}
             valid_users = {**DEMO_USERS, **secrets_users}
@@ -74,7 +74,7 @@ def login_screen():
                 st.rerun()
             else:
                 st.error("⚠️ Invalid username or password.")
-        
+       
         if st.button("⬅️ Back to Home"):
             st.session_state.page = "home"
             st.rerun()
@@ -94,7 +94,7 @@ def generate_pdf(data, logo_file):
             pass
 
     pdf.set_font("Arial", 'B', 16)
-    pdf.ln(25) 
+    pdf.ln(25)
     pdf.cell(0, 10, txt="Home Care Clinical Report", ln=True, align='C')
     pdf.ln(10)
     pdf.set_font("Arial", 'B', 12)
@@ -117,10 +117,10 @@ def generate_pdf(data, logo_file):
 def system_screen():
     st.sidebar.header("👤 Active Session")
     st.sidebar.info(f"Logged in as: **{st.session_state.current_user}**")
-    
+   
     st.sidebar.title("⚙️ Settings")
     uploaded_logo = st.sidebar.file_uploader("Company Logo", type=["png", "jpg", "jpeg"])
-    
+   
     st.sidebar.markdown("---")
     if st.sidebar.button("🚪 Logout"):
         st.session_state.logged_in = False
@@ -129,7 +129,7 @@ def system_screen():
 
     st.title("🩺 Specialized Nursing Management")
     st.write("---")
-    
+   
     st.subheader("Register New Patient Visit")
     col1, col2 = st.columns(2)
     with col1:
@@ -177,5 +177,6 @@ elif st.session_state.page == "system":
     else:
         st.session_state.page = "login"
         st.rerun()
+
 
 
